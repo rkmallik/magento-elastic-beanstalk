@@ -52,7 +52,47 @@
                 </connection>
             </default_setup>
         </resources>
-        <session_save><![CDATA[db]]></session_save>
+        
+        <session_save><![CDATA[memcache]]></session_save> <!-- db / memcache / empty=files -->
+        <session_save_path><![CDATA[tcp://magecache.xdsxdk.cfg.use1.cache.amazonaws.com:11211?persistent=1&weight=2&timeout=10&retry_interval=10]]></session_save_path><!-- e.g. for memcache session save handler tcp://10.0.0.1:11211?persistent=1&weight=2&timeout=10&retry_interval=10 -->
+        <session_cache_limiter><![CDATA[public]]></session_cache_limiter><!-- see http://php.net/manual/en/function.session-cache-limiter.php#82174 for possible values -->
+        <cache>
+            <backend>memcached</backend><!-- apc / memcached / xcache / empty=file -->
+            <slow_backend>database</slow_backend> <!-- database / file (default) - used for 2 levels cache setup, necessary for all shared memory storages -->
+            <slow_backend_store_data></slow_backend_store_data> <!-- 1 / 0 (default) - used for 2 levels cache setup, sets whether store data in db slow cache backend -->
+            <auto_refresh_fast_cache></auto_refresh_fast_cache> <!-- 1 / 0 (default) - used for 2 levels cache setup, sets whether refresh data in fast cache backend -->
+            <memcached><!-- memcached cache backend related config -->
+                <servers><!-- any number of server nodes can be included -->
+                    <server>
+                        <host><![CDATA[magecache.xdsxdk.cfg.use1.cache.amazonaws.com]]></host>
+                        <port><![CDATA[11211]]></port>
+                        <persistent><![CDATA[1]]></persistent>
+                        <weight><![CDATA[]]></weight>
+                        <timeout><![CDATA[]]></timeout>
+                        <retry_interval><![CDATA[]]></retry_interval>
+                        <status><![CDATA[]]></status>
+                    </server>
+                </servers>
+                <compression><![CDATA[0]]></compression>
+                <cache_dir><![CDATA[]]></cache_dir>
+                <hashed_directory_level><![CDATA[]]></hashed_directory_level>
+                <hashed_directory_umask><![CDATA[]]></hashed_directory_umask>
+                <file_name_prefix><![CDATA[]]></file_name_prefix>
+            </memcached>
+        </cache>
+
+        <!-- example of two level cache setup with slow backend at files. -->
+        <full_page_cache>
+            <backend_options>
+                 <cache_dir>full_page_cache</cache_dir>
+             </backend_options>
+             <slow_backend_options>
+                 <hashed_directory_level>1</hashed_directory_level>
+                 <hashed_directory_umask>0777</hashed_directory_umask>
+                 <file_name_prefix>fpc</file_name_prefix>
+                 <cache_dir><![CDATA[full_page_cache]]></cache_dir>
+             </slow_backend_options>
+         </full_page_cache>
     </global>
     <admin>
         <routers>
